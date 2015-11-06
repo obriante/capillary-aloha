@@ -26,7 +26,7 @@
 #include <ns3/ptr.h>
 #include <ns3/traced-value.h>
 
-#include "capillary-controller.h"
+#include <ns3/capillary-controller.h>
 
 namespace ns3 {
 
@@ -46,8 +46,11 @@ public:
   virtual Ptr<Node> GetNode (void) const;
   virtual Ptr<CapillaryMac> GetMac (void) const;
   virtual Time GetOffTime (void);
-  double GetThreshold () const;
-  void SetThreshold (double threshold);
+  virtual Time GetNextActivePeriod(void);
+  double GetMaxThreshold () const;
+  void SetMaxThreshold (double maxThreshold);
+  double GetMinThreshold () const;
+  void SetMinThreshold (double minThreshold);
 
 protected:
   virtual void DoInitialize (void);
@@ -57,7 +60,8 @@ private:
   Ptr<Node> m_node;
   Ptr<CapillaryMac> m_mac;
 
-  double m_threshold;
+  double m_maxThreshold;
+  double m_minThreshold;
   Time m_maxToff;
 
   TracedValue<Time> m_Toff;

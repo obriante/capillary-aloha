@@ -20,11 +20,11 @@
 #ifndef MODEL_BASIC_CONTROLLER_H_
 #define MODEL_BASIC_CONTROLLER_H_
 
-#include "capillary-controller.h"
-
 #include <ns3/capillary-mac.h>
 #include <ns3/node.h>
 #include <ns3/ptr.h>
+
+#include <ns3/capillary-controller.h>
 
 namespace ns3 {
 
@@ -44,6 +44,7 @@ public:
   virtual Ptr<Node> GetNode (void) const;
   virtual Ptr<CapillaryMac> GetMac (void) const;
   virtual Time GetOffTime (void);
+  virtual Time GetNextActivePeriod(void);
 
 protected:
   virtual void DoInitialize (void);
@@ -53,6 +54,7 @@ protected:
 private:
   Ptr<Node> m_node;
   Ptr<CapillaryMac> m_mac;
+  Time m_fixedDelay;
 };
 
 } /* namespace ns3 */

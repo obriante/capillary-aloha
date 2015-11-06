@@ -24,6 +24,7 @@
 #include <ns3/log-macros-disabled.h>
 #include <ns3/object-base.h>
 #include <ns3/type-id.h>
+#include <ns3/simulator.h>
 
 namespace ns3 {
 NS_LOG_COMPONENT_DEFINE ("BasicController");
@@ -45,8 +46,12 @@ BasicController::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::BasicController")
     .SetParent<CapillaryController> ()
-    .SetGroupName ("m2m-capillary")
+    .SetGroupName ("capillary-network")
     .AddConstructor<BasicController> ()
+    .AddAttribute ("FixedDelay",
+                   "The FixedDelayBetween two consecutive DCR", TimeValue (Seconds (1)),
+                   MakeTimeAccessor (&BasicController::m_fixedDelay),
+				   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -79,9 +84,23 @@ Time
 BasicController::GetOffTime (void)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_DEBUG (this);
-  return Time (Seconds (0));
+
+
+  Time OFF=GetNextActivePeriod()-Simulator::Now();
+  if(OFF<0)
+  {
+	  OFF=Seconds(0);
+  }
+  return OFF;
 }
+
+Time
+BasicController::GetNextActivePeriod(void)
+{
+  NS_LOG_FUNCTION (this);
+  return (m_activePeriodStart+m_fixedDelay);
+}
+
 
 void BasicController::DoInitialize (void)
 {

@@ -24,6 +24,7 @@
 #include <ns3/energy-module.h>
 #include <ns3/network-module.h>
 #include <ns3/capillary-network-module.h>
+#include <ns3/capillary-aloha-module.h>
 #include <ns3/config-store-module.h>
 #include <ns3/internet-module.h>
 #include <ns3/sixlowpan-module.h>
@@ -76,10 +77,10 @@ int main (int argc, char *argv[])
 {
   std::cout << "Simulation Started." << std::endl;
 
-  std::string configPath = "src/capillary-network/examples/";
-  std::string savePath = "src/capillary-network/examples/";
+  std::string configPath = "src/capillary-aloha/examples/";
+  std::string savePath = "src/capillary-aloha/examples/";
 
-  std::string configFile = configPath + "capillary-network-example.xml";
+  std::string configFile = configPath + "capillary-aloha-example.xml";
 
   bool debug = false;
 

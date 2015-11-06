@@ -42,9 +42,9 @@
 #include <cstring>
 #include <iterator>
 
-#include "capillary-mac-header.h"
-#include "capillary-mac-trailer.h"
-#include "capillary-phy.h"
+#include <ns3/capillary-mac-header.h>
+#include <ns3/capillary-mac-trailer.h>
+#include <ns3/capillary-phy.h>
 
 namespace ns3 {
 
@@ -689,6 +689,7 @@ void FsalohaMac::StartActivePeriod (void)
 
       MAC_DEBUG ("Is starting a new DCR.");
       m_activeDCR = CapillaryMac::ACTIVE_START;
+      m_controller->NotifyActivePeriodStart();
 
       if (!startDCRCallback.IsNull ())
         {

@@ -30,7 +30,7 @@
 #include <ns3/ptr.h>
 #include <string>
 
-#include "capillary-net-device.h"
+#include <ns3/capillary-net-device.h>
 
 namespace ns3 {
 

@@ -26,6 +26,7 @@
 #include <ns3/energy-module.h>
 #include <ns3/network-module.h>
 #include <ns3/capillary-network-module.h>
+#include <ns3/capillary-aloha-module.h>
 #include <ns3/config-store-module.h>
 #include <ns3/applications-module.h>
 
@@ -35,29 +36,29 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("fsaloha-capillary-test");
+NS_LOG_COMPONENT_DEFINE ("capillary-fsaloha-test");
 
-class FsalohaCapillaryTestCase : public TestCase
+class CapillaryFsalohaTestCase : public TestCase
 {
 public:
-  FsalohaCapillaryTestCase ();
-  virtual ~FsalohaCapillaryTestCase ();
+  CapillaryFsalohaTestCase ();
+  virtual ~CapillaryFsalohaTestCase ();
 
 private:
   virtual void DoRun (void);
 
 };
 
-FsalohaCapillaryTestCase::FsalohaCapillaryTestCase () :
+CapillaryFsalohaTestCase::CapillaryFsalohaTestCase () :
   TestCase ("Test FSALOHA Capillary classes")
 {
 }
 
-FsalohaCapillaryTestCase::~FsalohaCapillaryTestCase ()
+CapillaryFsalohaTestCase::~CapillaryFsalohaTestCase ()
 {
 }
 
-void FsalohaCapillaryTestCase::DoRun (void)
+void CapillaryFsalohaTestCase::DoRun (void)
 {
   NS_LOG_UNCOND ("Started..");
 
@@ -67,7 +68,7 @@ void FsalohaCapillaryTestCase::DoRun (void)
   std::string savePath = "src/capillary-network/test/";
 
   // input config store: txt format
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (savePath + "fsaloha-capillary-test.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (savePath + "capillary-fsaloha-test.xml"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
 
@@ -184,11 +185,11 @@ void FsalohaCapillaryTestCase::DoRun (void)
     }
 
   AsciiTraceHelper ascii;
-  logger.EnableAsciiAll (ascii.CreateFileStream (savePath + "fsaloha-capillary-packet"));
-  logger.EnableEnergyAscii (ascii.CreateFileStream (savePath + "fsaloha-capillary-energy"), energyModels);
-  logger.EnableDCRAscii (ascii.CreateFileStream (savePath + "fsaloha-capillary-DCR"), capillaryDevices);
+  logger.EnableAsciiAll (ascii.CreateFileStream (savePath + "capillary-fsaloha-packet"));
+  logger.EnableEnergyAscii (ascii.CreateFileStream (savePath + "capillary-fsaloha-energy"), energyModels);
+  logger.EnableDCRAscii (ascii.CreateFileStream (savePath + "capillary-fsaloha-DCR"), capillaryDevices);
 
-  logger.EnablePcapAll (savePath + "fsaloha-capillary-test");
+  logger.EnablePcapAll (savePath + "capillary-fsaloha-test");
 
   Simulator::Stop (stopTime);
 
@@ -200,16 +201,16 @@ void FsalohaCapillaryTestCase::DoRun (void)
 }
 
 // ==============================================================================
-class FsalohaCapillaryTestSuite : public TestSuite
+class CapillaryFsalohaTestSuite : public TestSuite
 {
 public:
-  FsalohaCapillaryTestSuite ();
+  CapillaryFsalohaTestSuite ();
 };
 
-FsalohaCapillaryTestSuite::FsalohaCapillaryTestSuite () :
-  TestSuite ("fsaloha-capillary-test", UNIT)
+CapillaryFsalohaTestSuite::CapillaryFsalohaTestSuite () :
+  TestSuite ("capillary-fsaloha-test", UNIT)
 {
-  AddTestCase (new FsalohaCapillaryTestCase, TestCase::QUICK);
+  AddTestCase (new CapillaryFsalohaTestCase, TestCase::QUICK);
 }
 
-static FsalohaCapillaryTestSuite fsalohaCapillaryTestSuite;
+static CapillaryFsalohaTestSuite CapillaryFsalohaTestSuite;

@@ -21,7 +21,6 @@
 #include "residual-energy-controller.h"
 
 #include <ns3/assert.h>
-#include <ns3/energy-controller.h>
 #include <ns3/energy-source-container.h>
 #include <ns3/capillary-net-device.h>
 #include <ns3/log.h>
@@ -59,7 +58,11 @@ TypeId ResidualEnergyController::GetTypeId (void)
     .AddConstructor<ResidualEnergyController> ()
     .AddAttribute ("MinTh",
                    "The Energy Store Device Threshold", DoubleValue (0.3),
-                   MakeDoubleAccessor (&ResidualEnergyController::SetThreshold, &ResidualEnergyController::GetThreshold),
+                   MakeDoubleAccessor (&ResidualEnergyController::SetMinThreshold, &ResidualEnergyController::GetMinThreshold),
+                   MakeDoubleChecker<double> (0,1))
+    .AddAttribute ("MaxTh",
+                   "The Energy Store Device Threshold", DoubleValue (0.7),
+                   MakeDoubleAccessor (&ResidualEnergyController::SetMaxThreshold, &ResidualEnergyController::GetMaxThreshold),
                    MakeDoubleChecker<double> (0,1))
     .AddAttribute ("MaxOffTime",
                    "The maximum off time", TimeValue (Seconds (60)),
@@ -73,18 +76,30 @@ TypeId ResidualEnergyController::GetTypeId (void)
 
 }
 
-
-double ResidualEnergyController::GetThreshold () const
+double ResidualEnergyController::GetMaxThreshold () const
 {
   NS_LOG_FUNCTION (this);
-  return m_threshold;
+  return m_maxThreshold;
 }
 
-void ResidualEnergyController::SetThreshold (double threshold)
+void ResidualEnergyController::SetMaxThreshold (double maxThreshold)
 {
-  NS_LOG_FUNCTION (this << threshold);
-  m_threshold = threshold;
+  NS_LOG_FUNCTION (this << maxThreshold);
+  m_maxThreshold = maxThreshold;
 }
+
+double ResidualEnergyController::GetMinThreshold () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_minThreshold;
+}
+
+void ResidualEnergyController::SetMinThreshold (double minThreshold)
+{
+  NS_LOG_FUNCTION (this << minThreshold);
+  m_minThreshold = minThreshold;
+}
+
 
 void ResidualEnergyController::SetNode (Ptr<Node> node)
 {
@@ -135,14 +150,17 @@ Time ResidualEnergyController::GetOffTime (void)
             }
         }
 
-
-      if (energyFraction <= m_threshold)
+      if (energyFraction >= m_maxThreshold)
+        {
+          m_Toff = Seconds (0);
+        }
+      else if (energyFraction <= m_minThreshold)
         {
           m_Toff = m_maxToff;
         }
       else
         {
-          double value = ((energyFraction) - m_threshold) / (1 - m_threshold);
+          double value = ((energyFraction) - m_minThreshold) / (m_maxThreshold - m_minThreshold);
           NS_LOG_DEBUG ("Value= " << value);
           m_Toff = Time (m_maxToff.GetDouble () - value * m_maxToff.GetDouble ());
         }
@@ -153,6 +171,13 @@ Time ResidualEnergyController::GetOffTime (void)
     }
 
   return Time (Seconds (0));
+}
+
+Time
+ResidualEnergyController::GetNextActivePeriod(void)
+{
+  NS_LOG_FUNCTION (this);
+  return (m_activePeriodStart+GetOffTime());
 }
 
 void ResidualEnergyController::DoInitialize (void)
@@ -172,4 +197,3 @@ void ResidualEnergyController::DoDispose (void)
 
 
 } /* namespace ns3 */
-
