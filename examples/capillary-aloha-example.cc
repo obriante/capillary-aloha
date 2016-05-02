@@ -83,6 +83,7 @@ int main (int argc, char *argv[])
   std::string configFile = configPath + "capillary-aloha-example.xml";
 
   bool debug = false;
+  bool defaultConfig = false;
 
   CapillaryLogHelper logger = CapillaryLogHelper ();
 
@@ -90,6 +91,7 @@ int main (int argc, char *argv[])
   cmd.AddValue ("debug", "Shows output debug.", debug);
   cmd.AddValue ("config", "The configuration file name to use", configFile);
   cmd.AddValue ("save_path", "The output path to save log", savePath);
+  cmd.AddValue ("default", "To save the config file", defaultConfig);
   cmd.Parse (argc, argv);
 
   if (debug)
@@ -100,8 +102,15 @@ int main (int argc, char *argv[])
   // input config store: txt format
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (configFile));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
-  //Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
+
+  if (defaultConfig)
+    {
+      Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
+    }
+  else
+    {
+      Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
+    }
 
   ConfigStore config;
 
@@ -150,7 +159,7 @@ int main (int argc, char *argv[])
   deviceHelper.SetChannel (channel);
   deviceHelper.SetTxPowerSpectralDensity (txPsd);
   deviceHelper.SetNoisePowerSpectralDensity (noisePsd);
-  deviceHelper.SetControllerTypeId ("ns3::EnergyController");
+  deviceHelper.SetControllerTypeId ("ns3::BasicController");
   NetDeviceContainer capillaryDevices = deviceHelper.Install (devices);
 
   uint32_t coordinatorIndex = (myConfig->nDevices / 2) + 1;

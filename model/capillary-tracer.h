@@ -56,7 +56,6 @@ public:
   virtual void EnableAsciiInternal (Ptr<OutputStreamWrapper> stream, Ptr<EnergySource> nd) = 0;
 
 protected:
-
   static void DefaultDataCollectionRoundSinkWithContext (Ptr<OutputStreamWrapper> stream, std::string context, CapillaryMac::DcrStatus previous, CapillaryMac::DcrStatus current);
   static void DefaultFramesSinkWithContext (Ptr<OutputStreamWrapper> stream, std::string context, int previous, int current);
   static void DefaultEnergyConsumptionSinkWithContext (Ptr<OutputStreamWrapper> stream, std::string context, double previous, double current);

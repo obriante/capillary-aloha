@@ -51,7 +51,7 @@ BasicController::GetTypeId (void)
     .AddAttribute ("FixedDelay",
                    "The FixedDelayBetween two consecutive DCR", TimeValue (Seconds (1)),
                    MakeTimeAccessor (&BasicController::m_fixedDelay),
-				   MakeTimeChecker ())
+                   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -85,20 +85,13 @@ BasicController::GetOffTime (void)
 {
   NS_LOG_FUNCTION (this);
 
-
-  Time OFF=GetNextActivePeriod()-Simulator::Now();
-  if(OFF<0)
-  {
-	  OFF=Seconds(0);
-  }
-  return OFF;
+  return m_fixedDelay;
 }
 
-Time
-BasicController::GetNextActivePeriod(void)
+void
+BasicController::NegoziateOffTime (Time toff)
 {
-  NS_LOG_FUNCTION (this);
-  return (m_activePeriodStart+m_fixedDelay);
+  NS_LOG_FUNCTION (this << toff);
 }
 
 

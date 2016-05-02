@@ -79,14 +79,13 @@ void CapillaryLogHelper::EnableLogComponents (enum LogLevel level)
   LogComponentEnable ("CapillaryPhy", level);
   LogComponentEnable ("CapillaryMac", level);
   LogComponentEnable ("CapillaryController", level);
-  LogComponentEnable ("EnergyController", level);
+  LogComponentEnable ("CapillaryNetDevice", level);
+  LogComponentEnable ("CapillaryEnergyModel", level);
+  LogComponentEnable ("SensorApplication", level);
   LogComponentEnable ("BasicController", level);
   LogComponentEnable ("ResidualEnergyController", level);
   LogComponentEnable ("CapillaryPhyIdeal", level);
   LogComponentEnable ("FsalohaMac", level);
-  LogComponentEnable ("CapillaryNetDevice", level);
-  LogComponentEnable ("CapillaryEnergyModel", level);
-  LogComponentEnable ("SensorApplication", level);
   Packet::EnablePrinting ();
   Packet::EnableChecking ();
 }

@@ -44,7 +44,8 @@ public:
   virtual Ptr<Node> GetNode (void) const;
   virtual Ptr<CapillaryMac> GetMac (void) const;
   virtual Time GetOffTime (void);
-  virtual Time GetNextActivePeriod(void);
+  virtual void NegoziateOffTime (Time toff);
+
 
 protected:
   virtual void DoInitialize (void);

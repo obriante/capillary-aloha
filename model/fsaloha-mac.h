@@ -167,6 +167,8 @@ private:
 
   Time m_startFrame;
 
+  Time m_nextDCR;
+
   std::vector<SlotState> m_slotStatus;
 
   /** Controller */

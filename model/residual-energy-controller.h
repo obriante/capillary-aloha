@@ -46,7 +46,8 @@ public:
   virtual Ptr<Node> GetNode (void) const;
   virtual Ptr<CapillaryMac> GetMac (void) const;
   virtual Time GetOffTime (void);
-  virtual Time GetNextActivePeriod(void);
+  virtual void NegoziateOffTime (Time toff);
+
   double GetMaxThreshold () const;
   void SetMaxThreshold (double maxThreshold);
   double GetMinThreshold () const;
@@ -63,6 +64,9 @@ private:
   double m_maxThreshold;
   double m_minThreshold;
   Time m_maxToff;
+  Time m_minToff;
+
+  Time m_negoziatedToff;
 
   TracedValue<Time> m_Toff;
 };

@@ -41,48 +41,48 @@ CapillaryTracer::~CapillaryTracer ()
 void
 CapillaryTracer::EnableDCRAscii (std::string fileName, NetDeviceContainer n)
 {
-	for (NetDeviceContainer::Iterator i = n.Begin (); i != n.End (); ++i)
-	    {
-	      Ptr<CapillaryNetDevice> dev = DynamicCast<CapillaryNetDevice> (*i);
-	      NS_ASSERT (dev);
+  for (NetDeviceContainer::Iterator i = n.Begin (); i != n.End (); ++i)
+    {
+      Ptr<CapillaryNetDevice> dev = DynamicCast<CapillaryNetDevice> (*i);
+      NS_ASSERT (dev);
 
-	      std::ostringstream outputSuffix;
-	      outputSuffix <<fileName << "." << dev->GetNode()->GetId() << ".tr";
-	      AsciiTraceHelper ascii;
-	      Ptr<OutputStreamWrapper> stream=ascii.CreateFileStream (outputSuffix.str());
-	      EnableAsciiInternal (stream, dev);
-	    }
-	}
+      std::ostringstream outputSuffix;
+      outputSuffix << fileName << "." << dev->GetNode ()->GetId () << ".tr";
+      AsciiTraceHelper ascii;
+      Ptr<OutputStreamWrapper> stream = ascii.CreateFileStream (outputSuffix.str ());
+      EnableAsciiInternal (stream, dev);
+    }
+}
 
 void
 CapillaryTracer::EnableEnergyAscii (std::string fileName, DeviceEnergyModelContainer n)
 {
-	for (DeviceEnergyModelContainer::Iterator i = n.Begin (); i != n.End (); ++i)
-	    {
-	      Ptr<CapillaryEnergyModel> dev = DynamicCast<CapillaryEnergyModel> (*i);
-	      NS_ASSERT (dev);
-	      std::ostringstream outputSuffix;
-	      outputSuffix <<fileName << "." << dev->GetNode()->GetId() << ".tr";
-	      AsciiTraceHelper ascii;
-	      Ptr<OutputStreamWrapper> stream=ascii.CreateFileStream (outputSuffix.str());
-	      EnableAsciiInternal (stream, dev);
-	    }
-	}
+  for (DeviceEnergyModelContainer::Iterator i = n.Begin (); i != n.End (); ++i)
+    {
+      Ptr<CapillaryEnergyModel> dev = DynamicCast<CapillaryEnergyModel> (*i);
+      NS_ASSERT (dev);
+      std::ostringstream outputSuffix;
+      outputSuffix << fileName << "." << dev->GetNode ()->GetId () << ".tr";
+      AsciiTraceHelper ascii;
+      Ptr<OutputStreamWrapper> stream = ascii.CreateFileStream (outputSuffix.str ());
+      EnableAsciiInternal (stream, dev);
+    }
+}
 
 void
 CapillaryTracer::EnableSourceAscii (std::string fileName, EnergySourceContainer n)
 {
-	for (EnergySourceContainer::Iterator i = n.Begin (); i != n.End (); ++i)
-	    {
-	      Ptr<EnergySource> dev = DynamicCast<EnergySource> (*i);
-	      NS_ASSERT (dev);
-	      std::ostringstream outputSuffix;
-	      outputSuffix <<fileName << "." << dev->GetNode()->GetId() << ".tr";
-	      AsciiTraceHelper ascii;
-	      Ptr<OutputStreamWrapper> stream=ascii.CreateFileStream (outputSuffix.str());
-	      EnableAsciiInternal (stream, dev);
-	    }
-	}
+  for (EnergySourceContainer::Iterator i = n.Begin (); i != n.End (); ++i)
+    {
+      Ptr<EnergySource> dev = DynamicCast<EnergySource> (*i);
+      NS_ASSERT (dev);
+      std::ostringstream outputSuffix;
+      outputSuffix << fileName << "." << dev->GetNode ()->GetId () << ".tr";
+      AsciiTraceHelper ascii;
+      Ptr<OutputStreamWrapper> stream = ascii.CreateFileStream (outputSuffix.str ());
+      EnableAsciiInternal (stream, dev);
+    }
+}
 
 void
 CapillaryTracer::EnableDCRAscii (Ptr<OutputStreamWrapper> stream, NetDeviceContainer n)

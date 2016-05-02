@@ -1,4 +1,3 @@
-/* -*- Mode:C++{} c-file-style:"gnu"{} indent-tabs-mode:nil{} -*- */
 /*
  * Copyright (c) 2015 Universita' Mediterranea di Reggio Calabria (UNIRC)
  *
@@ -316,7 +315,7 @@ bool FsalohaMac::DataEnqueue (Ptr<Packet> packet, const Address& source, const A
 
             packet->AddHeader (macHdr);
 
-            m_queue->Enqueue (packet);
+            m_queue->Enqueue (Create<QueueItem> (packet));
 
             MAC_DEBUG ("Data Queue: " << m_queue->GetNPackets ());
 
@@ -347,10 +346,12 @@ bool FsalohaMac::TrasmissionEnqueue (void)
               break;
             }
 
-          Ptr<Packet> p = m_queue->Dequeue ();
-          if (p)
+          Ptr<QueueItem> item = m_queue->Dequeue ();
+          if (item)
             {
-              m_TxQueue->Enqueue (p);
+              Ptr<Packet> p =  item->GetPacket ();
+
+              m_TxQueue->Enqueue (Create<QueueItem> (p));
               m_macTxEnqueueTrace (p);
             }
         }
@@ -365,9 +366,13 @@ bool FsalohaMac::TrasmissionEnqueue (void)
     {
       MAC_DEBUG ("Transmission Queue: " << m_TxQueue->GetNPackets ());
 
-      m_currentPkt = m_TxQueue->Dequeue ();
-      if (m_currentPkt)
+
+
+      Ptr<QueueItem> item =  m_TxQueue->Dequeue ();
+      if (item)
         {
+
+          m_currentPkt = item->GetPacket ();
           return true;
         }
     }
@@ -503,7 +508,7 @@ void FsalohaMac::NotifyReceptionEndOk (Ptr<Packet> p)
           switch (m_dev->GetType ())
             {
             case CapillaryNetDevice::COORDINATOR:
-
+              m_controller->NegoziateOffTime (Seconds ((double)header.GetEnergyValue ()));
               switch (header.GetFrameType ())
                 {
                 case CapillaryMacHeader::CAPILLARY_MAC_DATA:
@@ -526,7 +531,7 @@ void FsalohaMac::NotifyReceptionEndOk (Ptr<Packet> p)
               break;
 
             case CapillaryNetDevice::END_DEVICE:
-
+              m_nextDCR = Simulator::Now () + Seconds ((double)header.GetEnergyValue ());
               if (header.GetDstAddr () == Mac64Address::ConvertFrom (GetAddress ())
                   || header.GetDstAddr () == Mac64Address::ConvertFrom (GetBroadcast ()))
                 {
@@ -576,7 +581,10 @@ void FsalohaMac::NotifyReceptionEndOk (Ptr<Packet> p)
                                     m_currentPkt = 0;
                                     if (!m_TxQueue->IsEmpty ())
                                       {
-                                        m_currentPkt = m_TxQueue->Dequeue ();
+                                        Ptr<QueueItem> item = m_TxQueue->Dequeue ();
+                                        NS_ASSERT (item);
+                                        m_currentPkt = item->GetPacket ();
+
                                         StartFrame ();
                                       }
                                     else
@@ -689,7 +697,7 @@ void FsalohaMac::StartActivePeriod (void)
 
       MAC_DEBUG ("Is starting a new DCR.");
       m_activeDCR = CapillaryMac::ACTIVE_START;
-      m_controller->NotifyActivePeriodStart();
+      m_controller->NotifyActivePeriodStart ();
 
       if (!startDCRCallback.IsNull ())
         {
@@ -779,7 +787,7 @@ void FsalohaMac::StartNonActivePeriod (void)
 
   m_activeDCR = CapillaryMac::NON_ACTIVE_START;
 
-  Time off = m_controller->GetOffTime ();
+  Time off = m_nextDCR - Simulator::Now ();
 
   if (off > m_phy->GetSwitchingTime ())
     {
@@ -1000,6 +1008,33 @@ bool FsalohaMac::ForwardDown (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this);
 
+  CapillaryMacHeader macHdr;
+  p->RemoveHeader (macHdr);
+
+  CapillaryMacHeader::FrameType currentFrameType = macHdr.GetFrameType ();
+
+
+  switch (m_dev->GetType ())
+    {
+    case CapillaryNetDevice::COORDINATOR:
+      if (currentFrameType == CapillaryMacHeader::CAPILLARY_MAC_RFD)
+        {
+          Time Toff = m_controller->GetOffTime ();
+          m_nextDCR = Simulator::Now () + Toff;
+          macHdr.SetEnergyValue ((uint8_t)Toff.GetSeconds ());
+        }
+      else
+        {
+          macHdr.SetEnergyValue ((uint8_t)(m_nextDCR - Simulator::Now ()).GetSeconds ());
+        }
+      break;
+    case CapillaryNetDevice::END_DEVICE:
+      Time Toff = m_controller->GetOffTime ();
+      macHdr.SetEnergyValue ((uint8_t)Toff.GetSeconds ());
+      break;
+    }
+
+  p->AddHeader (macHdr);
   p->AddTrailer (CapillaryMacTrailer (p));
 
   if (!m_phy->StartTx (p))

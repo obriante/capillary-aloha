@@ -64,9 +64,13 @@ TypeId ResidualEnergyController::GetTypeId (void)
                    "The Energy Store Device Threshold", DoubleValue (0.7),
                    MakeDoubleAccessor (&ResidualEnergyController::SetMaxThreshold, &ResidualEnergyController::GetMaxThreshold),
                    MakeDoubleChecker<double> (0,1))
-    .AddAttribute ("MaxOffTime",
+    .AddAttribute ("MaxToff",
                    "The maximum off time", TimeValue (Seconds (60)),
                    MakeTimeAccessor (&ResidualEnergyController::m_maxToff),
+                   MakeTimeChecker ())
+    .AddAttribute ("MinToff",
+                   "The minnimum off time", TimeValue (Seconds (1)),
+                   MakeTimeAccessor (&ResidualEnergyController::m_minToff),
                    MakeTimeChecker ())
     .AddTraceSource ("Toff",
                      "The OFF Time",
@@ -150,11 +154,11 @@ Time ResidualEnergyController::GetOffTime (void)
             }
         }
 
-      if (energyFraction >= m_maxThreshold)
+      if (energyFraction > m_maxThreshold)
         {
-          m_Toff = Seconds (0);
+          m_Toff =  m_minToff;
         }
-      else if (energyFraction <= m_minThreshold)
+      else if (energyFraction < m_minThreshold)
         {
           m_Toff = m_maxToff;
         }
@@ -167,24 +171,39 @@ Time ResidualEnergyController::GetOffTime (void)
 
       NS_LOG_DEBUG ("Node (" << m_node->GetId () << "): Energy Fraction: " << energyFraction << " %, TimeOff: " << m_Toff.Get ().GetSeconds () << "[sec]");
 
-      return m_Toff;
+    }
+  else
+    {
+      m_Toff = m_minToff + m_negoziatedToff;
+      m_negoziatedToff = Seconds (0);
     }
 
-  return Time (Seconds (0));
+  return m_Toff;
 }
 
-Time
-ResidualEnergyController::GetNextActivePeriod(void)
+void ResidualEnergyController::NegoziateOffTime (Time toff)
 {
-  NS_LOG_FUNCTION (this);
-  return (m_activePeriodStart+GetOffTime());
+  NS_LOG_FUNCTION (this << toff);
+  if (toff > m_negoziatedToff)
+    {
+      m_negoziatedToff = toff;
+    }
+
+  if (m_negoziatedToff > m_maxToff)
+    {
+      m_negoziatedToff = m_maxToff;
+    }
+
+  if (m_negoziatedToff < Seconds (0))
+    {
+      m_negoziatedToff = Seconds (0);
+    }
 }
 
 void ResidualEnergyController::DoInitialize (void)
 {
   NS_LOG_FUNCTION (this);
-
-
+  m_negoziatedToff = m_maxToff;
 }
 
 void ResidualEnergyController::DoDispose (void)
